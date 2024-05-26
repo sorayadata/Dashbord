@@ -49,7 +49,7 @@ shap==0.45.0
 six==1.16.0
 slicer==0.0.7
 stack-data==0.6.3
-streamlit==1.10.0
+streamlit==1.30.0
 threadpoolctl==3.5.0
 tifffile==2024.5.3
 tqdm==4.66.4
