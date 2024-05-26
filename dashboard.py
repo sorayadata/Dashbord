@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 # Définition de l'URL de l'API
-#url_api = 'http://127.0.0.1:5000/'  # local API
-url_api = 'http://credit.consommationapp.com/'  # online API
+url_api = 'http://127.0.0.1:5000/'  # local API
+#url_api = 'http://credit.consommationapp.com/'  # online API
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
