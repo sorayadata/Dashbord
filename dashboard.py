@@ -110,14 +110,14 @@ def main():
                     plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
 
 
-@st.cache_data()
+@st.cache()
 def load_logo(folder='img', filename='logo', ext='png'):
     path = './' + folder + '/' + filename + '.' + ext
     logo = Image.open(path) 
     return logo
 
 
-@st.cache_data()
+@st.cache()
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     if divisor != 1:
         data = [d / divisor for d in data]
@@ -132,7 +132,7 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     st.pyplot()
 
 
-@st.cache_data()
+@st.cache()
 def plot_risk(proba, treshold=10, max_val=None):
     if max_val is None:
         max_val = treshold * 2
@@ -158,14 +158,14 @@ def plot_risk(proba, treshold=10, max_val=None):
     st.plotly_chart(fig)
 
 
-@st.cache_data()
+@st.cache()
 def load_client_info(client_id):
     response = requests.get(url_api + "/client?id=" + str(client_id))
     client_info = response.json()
     return client_info
 
 
-@st.cache_data()
+@st.cache()
 def load_data(col):
     url = url_api + '/data?col=' + col
     response = requests.get(url)
@@ -173,7 +173,7 @@ def load_data(col):
     return data_list
 
 
-@st.cache_data()
+@st.cache()
 def load_id_list():
     response = requests.get(url_api + "/client_list")
     id_list = response.json()
