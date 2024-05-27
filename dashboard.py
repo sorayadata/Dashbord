@@ -107,17 +107,15 @@ def main():
                     xlabel = f"{label.capitalize()} ({unit})"
                     divisor = chart_dict[col]['divisor']
                     data = load_data(col)
-                    plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
+                    fig = plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
+                    st.pyplot(fig)
 
-
-@st.cache()
+@st.cache_data()
 def load_logo(folder='img', filename='logo', ext='png'):
     path = './' + folder + '/' + filename + '.' + ext
     logo = Image.open(path) 
     return logo
 
-
-@st.cache()
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     if divisor != 1:
         data = [d / divisor for d in data]
@@ -129,10 +127,9 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     plt.title(title, fontsize=15)
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    st.pyplot()
+    fig = plt.gcf()
+    return fig
 
-
-@st.cache()
 def plot_risk(proba, treshold=10, max_val=None):
     if max_val is None:
         max_val = treshold * 2
@@ -157,36 +154,32 @@ def plot_risk(proba, treshold=10, max_val=None):
 
     st.plotly_chart(fig)
 
-
-@st.cache()
+@st.cache_data()
 def load_client_info(client_id):
     response = requests.get(url_api + "/client?id=" + str(client_id))
     client_info = response.json()
     return client_info
 
-
-@st.cache()
+@st.cache_data()
 def load_data(col):
     url = url_api + '/data?col=' + col
     response = requests.get(url)
     data_list = response.json()
     return data_list
 
-
-@st.cache()
+@st.cache_data()
 def load_id_list():
     response = requests.get(url_api + "/client_list")
     id_list = response.json()
     id_list = ['Client ID'] + id_list
     return id_list
 
-
 def get_label_list_str(label_list, sep=', '):
     string = sep.join(label_list)
     return string
 
-
 if __name__ == "__main__":
     main()
+
 
     
