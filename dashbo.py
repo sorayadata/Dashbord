@@ -16,8 +16,8 @@ def main():
     label_list = ['age', 'annuity amount', 'credit amount', 'income amount']
     
     # Title and subtitle
-    st.title("Prêt à dépenser - Dashboard")
-    st.markdown("<i>Default risk calculator - Version 1.0</i>", unsafe_allow_html=True)
+    st.title("Prêt à dépenser")
+    st.markdown("<i>Default risk calculator>", unsafe_allow_html=True)
     st.markdown(f"This web application let the user know how likely (in percentage) is it that a given credit applicant will go into non-performing loans. \
                  Furthermore, it optionally shows some customers informations, such as {get_label_list_str(label_list)}. It is finally possible to compare the applicant \
                  to all applicants with respect to these variables.", unsafe_allow_html=True)
