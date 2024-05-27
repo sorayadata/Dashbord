@@ -110,7 +110,7 @@ def main():
                     fig = plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
                     st.pyplot(fig)
 
-@st.cache_data()
+@st.cache
 def load_logo(folder='img', filename='logo', ext='png'):
     path = './' + folder + '/' + filename + '.' + ext
     logo = Image.open(path) 
@@ -154,20 +154,20 @@ def plot_risk(proba, treshold=10, max_val=None):
 
     st.plotly_chart(fig)
 
-@st.cache_data()
+@st.cache
 def load_client_info(client_id):
     response = requests.get(url_api + "/client?id=" + str(client_id))
     client_info = response.json()
     return client_info
 
-@st.cache_data()
+@st.cache
 def load_data(col):
     url = url_api + '/data?col=' + col
     response = requests.get(url)
     data_list = response.json()
     return data_list
 
-@st.cache_data()
+@st.cache
 def load_id_list():
     response = requests.get(url_api + "/client_list")
     id_list = response.json()
