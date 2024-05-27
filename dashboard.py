@@ -1,6 +1,5 @@
+# Importations de bibliothèques
 import streamlit as st
-import numpy as np
-import pandas as pd
 import requests
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -8,13 +7,9 @@ from PIL import Image
 
 # Définition de l'URL de l'API
 url_api = 'http://127.0.0.1:5000'  # local API
-#url_api = 'http://credit.consommationapp.com/'  # online API
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
+# Fonction principale
 def main():
-    label_list = ['age', 'annuity amount', 'credit amount', 'income amount']
-    
     # Title and subtitle
     st.title("Prêt à dépenser")
     st.markdown("<i>Calculateur de risque de défaut </i>", unsafe_allow_html=True)
@@ -24,98 +19,58 @@ def main():
     logo = load_logo()
     st.sidebar.image(logo, width=300)
     
-    # Affichage d'informations dans la sidebar
+    # Sidebar
     st.sidebar.subheader("Informations générales")
-    
-    # Selectbox (client)
     id_list = load_id_list()
-    global client_id
     client_id = st.sidebar.selectbox("Sélectionner un client", id_list)
     
-    # ID list loading
     if client_id != 'Client ID':
         client_info = load_client_info(client_id)
-        
-        # Default probability calculation
-        if client_id != 'Client ID':
-            url_api_client = url_api + '/predict_default?id_client=' + str(client_id)
-            response = requests.get(url_api_client)
-            status_code = response.status_code    
-            
-            # Client not found
-            if status_code != 200:
-                st.markdown(f":red[Client not found (*Error {status_code}*).]")
-            else:
-                # Risk chart
-                client_data = response.json()
-                proba = client_data['proba_1']
-                proba = proba * 100
-                plot_risk(proba, treshold=50)
-                
-                # Client compare chart (age, annuity amount, credit amount, total income amount)
-                chart_option_dict = {'DAYS_BIRTH': 'age', 
-                                     'AMT_ANNUITY': 'annuity amount', 
-                                     'AMT_CREDIT': 'credit amount', 
-                                     'AMT_INCOME_TOTAL': 'income amount'}
-                
-                variable_list = chart_option_dict.keys()
-                
-                label_list = ['age', 'annuity amount', 'credit amount', 'income amount']
-                title_list = ['Clients age', 'Annuities amount', 'Credits amount', 'Total incomes']
-                unit_list_side  = ["years", "$", "$", "$"]
-                unit_list  = ["years", "$", "millions $", "millions $"]
-                divide_by_list = [365, 1, 1, 1]
+        load_data(client_info)
 
-                var_key_list = ['label', 'title', 'unit_side', 'unit', 'divisor']
-                var_value_list = [label_list, title_list, unit_list_side, unit_list, divide_by_list]
-                
-                show_client_info = st.sidebar.checkbox("Afficher les informations client")
-                
-                chart_dict = dict()
-                
-                for i, v in enumerate(variable_list):
-                    var = v
-                    var_dict = dict()
-                    for j, k in enumerate(var_key_list):
-                        var_dict[k] = var_value_list[j][i]
-                    
-                    chart_dict[var] = var_dict
-                    
-                    # Client info (age, annuity amount, credit amount, total income amount)
-                    if show_client_info:
-                        var_label = chart_dict[var]['label'].capitalize()
-                        var_val = client_info[var]
-                        if divide_by_list[i] != 1:
-                            var_val = int(var_val / divide_by_list[i])
-                        st.sidebar.markdown(f"<b>{var_label}</b>: {var_val} {chart_dict[var]['unit_side']}", unsafe_allow_html=True)
-                
-                st.sidebar.subheader("Compare client")
-                
-                chart_option_list = list(chart_option_dict.values())
-                chart_option_list = ['Chart type'] + chart_option_list
-                chart_option_value = st.sidebar.selectbox("Sélectionner un graphique", chart_option_list)
-                
-                if chart_option_value != 'Chart type':
-                    for key, value in chart_option_dict.items():
-                        if value == chart_option_value:
-                            col = key
-                            break
-                    
-                    label = chart_dict[col]['label']
-                    title = chart_dict[col]['title']
-                    unit = chart_dict[col]['unit']
-                    xlabel = f"{label.capitalize()} ({unit})"
-                    divisor = chart_dict[col]['divisor']
-                    data = load_data(col)
-                    fig = plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
-                    st.pyplot(fig)
-
+# Chargement du logo
 @st.cache
 def load_logo(folder='img', filename='logo', ext='png'):
     path = './' + folder + '/' + filename + '.' + ext
     logo = Image.open(path) 
     return logo
 
+# Chargement des informations client
+@st.cache
+def load_client_info(client_id):
+    response = requests.get(url_api + "/client?id=" + str(client_id))
+    if response.status_code == 200:
+        client_info = response.json()
+        return client_info
+    else:
+        st.error(f"Erreur lors du chargement des informations client: {response.status_code}")
+        return None
+
+# Chargement des données
+@st.cache(allow_output_mutation=True)
+def load_data(client_info):
+    if client_info is not None:
+        response = requests.get(url_api + '/data')
+        if response.status_code == 200:
+            data_list = response.json()
+            return data_list
+        else:
+            st.error(f"Erreur lors du chargement des données: {response.status_code}")
+            return None
+
+# Chargement de la liste des IDs des clients
+@st.cache
+def load_id_list():
+    response = requests.get(url_api + "/client_list")
+    if response.status_code == 200:
+        id_list = response.json()
+        id_list = ['Client ID'] + id_list
+        return id_list
+    else:
+        st.error(f"Erreur lors du chargement de la liste des IDs des clients: {response.status_code}")
+        return None
+
+# Tracé de l'histogramme
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     if divisor != 1:
         data = [d / divisor for d in data]
@@ -130,6 +85,7 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     fig = plt.gcf()
     return fig
 
+# Tracé du graphique de risque
 def plot_risk(proba, treshold=10, max_val=None):
     if max_val is None:
         max_val = treshold * 2
@@ -153,30 +109,6 @@ def plot_risk(proba, treshold=10, max_val=None):
     fig.update_layout(paper_bgcolor="white", font={'color': "darkblue", 'family': "Arial"})
 
     st.plotly_chart(fig)
-
-@st.cache
-def load_client_info(client_id):
-    response = requests.get(url_api + "/client?id=" + str(client_id))
-    client_info = response.json()
-    return client_info
-
-@st.cache
-def load_data(col):
-    url = url_api + '/data?col=' + col
-    response = requests.get(url)
-    data_list = response.json()
-    return data_list
-
-@st.cache
-def load_id_list():
-    response = requests.get(url_api + "/client_list")
-    id_list = response.json()
-    id_list = ['Client ID'] + id_list
-    return id_list
-
-def get_label_list_str(label_list, sep=', '):
-    string = sep.join(label_list)
-    return string
 
 if __name__ == "__main__":
     main()
