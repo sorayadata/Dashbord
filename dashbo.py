@@ -6,8 +6,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from PIL import Image
 
-#url_api = 'http://localhost:5000/'                  # local API
-url_api = "http://15.237.254.47"      # online API
+url_api = 'http://localhost:5000'                  # local API
+#url_api = "http://15.237.254.47"      # online API
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -114,7 +114,7 @@ def main():
                 data = load_data(col)
                 plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
 
-@st.cache()
+@st.cache_data()
 def load_logo(folder='img', filename='logo', ext='png'):
     path = './' + folder + '/' + filename + '.' + ext
     logo = Image.open(path) 
@@ -160,20 +160,20 @@ def plot_risk(proba, treshold=10, max_val=None):
 
     st.plotly_chart(fig)
 
-@st.cache()
+@st.cache_data()
 def load_client_info(client_id):
     response = requests.get(url_api + "/client?id=" + str(client_id))
     client_info = response.json()
     return client_info
 
-@st.cache()
+@st.cache_data()
 def load_data(col):
     url = url_api + '/data?col=' + col
     response = requests.get(url)
     data_list = response.json()
     return data_list
     
-@st.cache()
+@st.cache_data()
 def load_id_list():
     response = requests.get(url_api + "/client_list")
     id_list = response.json()
