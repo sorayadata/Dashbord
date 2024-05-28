@@ -120,7 +120,7 @@ def load_logo(folder='img', filename='logo', ext='png'):
     logo = Image.open(path) 
     return logo
 
-@st.cache()
+
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     if(divisor!=1):
         data = [d / divisor for d in data]
@@ -134,7 +134,7 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     plt.ylabel(ylabel, fontsize=12)
     st.pyplot()
 
-@st.cache()
+
 def plot_risk(proba, treshold=10, max_val=None):
     
     if(max_val==None):
@@ -173,7 +173,7 @@ def load_data(col):
     data_list = response.json()
     return data_list
     
-@st.cache_()
+@st.cache()
 def load_id_list():
     response = requests.get(url_api + "/client_list")
     id_list = response.json()
