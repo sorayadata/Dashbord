@@ -6,8 +6,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from PIL import Image
 
-url_api = 'http://localhost:5000/'                  # local API
-#url_api = 'https://biancof.pythonanywhere.com/'     # online API
+#url_api = 'http://localhost:5000/'                  # local API
+url_api = 'http://15.237.254.47/'     # online API
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
