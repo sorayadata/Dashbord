@@ -12,115 +12,114 @@ url_api = 'http://127.0.0.1:5000'                  # local API
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 def main():
-    
+
     label_list = ['age', 'annuity amount', 'credit amount', 'income amount']
-    
+
     # Title and subtitle
     st.title("Prêt à dépenser")
     st.markdown("<i>Default risk calculator>", unsafe_allow_html=True)
-    st.markdown(f"This web application let the user know how likely (in percentage) is it that a given credit applicant will go into non-performing loans. \
+    st.markdown(
+        f"This web application let the user know how likely (in percentage) is it that a given credit applicant will go into non-performing loans. \
                  Furthermore, it optionally shows some customers informations, such as {get_label_list_str(label_list)}. It is finally possible to compare the applicant \
                  to all applicants with respect to these variables.", unsafe_allow_html=True)
-    
+
     # Logo
     logo = load_logo()
     st.sidebar.image(logo, width=300)
-    
+
     # Affichage d'informations dans la sidebar
     st.sidebar.subheader("General information")
-    
+
     # Selectbox (client)
     id_list = load_id_list()
     global client_id
     client_id = st.sidebar.selectbox("Select a client", id_list)
-    
+
     # ID list loading
-    if(client_id!='Client ID'):
+    if (client_id != 'Client ID'):
         client_info = load_client_info(client_id)
-    
+
     # Default probability calculation
-    if(client_id!='Client ID'):
-        
+    if (client_id != 'Client ID'):
         url_api_client = url_api + '/predict_default?id_client=' + str(client_id)
-        response = requests.get(url_api_client)
-        status_code = response.status_code
-        
-        # Client not found
-        if(status_code!=200):
-     
-            st.markdown(f":red[Client not found (*Error {status_code}*).]")
-            
-        else:
-            
-            # Risk chart
-            client_data = response.json()
-            proba = client_data['proba_1']
-            proba = proba * 100
-            plot_risk(proba, treshold=50)
-            
-            # Client compare chart (age, annuity amount, credit amount, total income amount)
-            chart_option_dict = {'DAYS_BIRTH': 'age', 
-                                 'AMT_ANNUITY': 'annuity amount', 
-                                 'AMT_CREDIT': 'credit amount', 
-                                 'AMT_INCOME_TOTAL': 'income amount'}
-            
-            variable_list = chart_option_dict.keys()
-            
-            label_list = ['age', 'annuity amount', 'credit amount', 'income amount']
-            title_list = ['Clients age', 'Annuities amount', 'Credits amount', 'Total incomes']
-            unit_list_side  = ["years", "$", "$", "$"]
-            unit_list  = ["years", "$", "millions $", "millions $"]
-            divide_by_list = [365, 1, 1, 1]
+        try:
+            response = requests.get(url_api_client)
+            status_code = response.status_code
+            if (status_code != 200):
+                st.markdown(
+                    f":red[Client not found (*Error {status_code}*).]")
+            else:
+                # Risk chart
+                client_data = response.json()
+                proba = client_data['proba_1']
+                proba = proba * 100
+                plot_risk(proba, treshold=50)
 
-            var_key_list = ['label', 'title', 'unit_side', 'unit', 'divisor']
-            var_value_list = [label_list, title_list, unit_list_side, unit_list, divide_by_list]
-            
-            show_client_info = st.sidebar.checkbox("Show client info")
-            
-            chart_dict = dict()
-            
-            for i, v in enumerate(variable_list):
-                var = v
-                var_dict = dict()
-                for j, k in enumerate(var_key_list):
-                    var_dict[k] = var_value_list[j][i]
-                
-                chart_dict[var] = var_dict
-                
-                # Client info (age, annuity amount, credit amount, total income amount)
-                if(show_client_info):
-             
-                    var_label = chart_dict[var]['label'].capitalize()
-                    var_val = client_info[var]
-                    if(divide_by_list[i]!=1):
-                        var_val = int(var_val/divide_by_list[i])
-                    st.sidebar.markdown(f"<b>{var_label}</b>: {var_val} {chart_dict[var]['unit_side']}", unsafe_allow_html=True)
-            
-            st.sidebar.subheader("Compare client")
-       
-            chart_option_list = list(chart_option_dict.values())
-            chart_option_list = ['Chart type'] + chart_option_list
-            chart_option_value = st.sidebar.selectbox("Select a chart", chart_option_list)
-            
-            if(chart_option_value!='Chart type'):
-                for key, value in chart_option_dict.items():
-                    if(value==chart_option_value):
-                        col = key
-                        break
-                
-                label = chart_dict[col]['label']
-                title = chart_dict[col]['title']
-                unit = chart_dict[col]['unit']
-                xlabel = f"{label.capitalize()} ({unit})"
-                divisor = chart_dict[col]['divisor']
-                data = load_data(col)
-                plot_hist(data, client_info[col], title=title, xlabel=xlabel, divisor=divisor)
+                # Client compare chart (age, annuity amount, credit amount, total income amount)
+                chart_option_dict = {'DAYS_BIRTH': 'age',
+                                     'AMT_ANNUITY': 'annuity amount',
+                                     'AMT_CREDIT': 'credit amount',
+                                     'AMT_INCOME_TOTAL': 'income amount'}
 
-@st.cache_data
-def load_logo(folder='img', filename='logo', ext='png'):
-    path = './' + folder + '/' + filename + '.' + ext
-    logo = Image.open(path) 
-    return logo
+                variable_list = chart_option_dict.keys()
+
+                label_list = ['age', 'annuity amount',
+                              'credit amount', 'income amount']
+                title_list = ['Clients age', 'Annuities amount',
+                              'Credits amount', 'Total incomes']
+                unit_list_side = ["years", "$", "$", "$"]
+                unit_list = ["years", "$", "millions $", "millions $"]
+                divide_by_list = [365, 1, 1, 1]
+
+                var_key_list = ['label', 'title',
+                                'unit_side', 'unit', 'divisor']
+                var_value_list = [label_list, title_list,
+                                  unit_list_side, unit_list, divide_by_list]
+
+                show_client_info = st.sidebar.checkbox("Show client info")
+
+                chart_dict = dict()
+
+                for i, v in enumerate(variable_list):
+                    var = v
+                    var_dict = dict()
+                    for j, k in enumerate(var_key_list):
+                        var_dict[k] = var_value_list[j][i]
+
+                    chart_dict[var] = var_dict
+
+                    # Client info (age, annuity amount, credit amount, total income amount)
+                    if (show_client_info):
+                        var_label = chart_dict[var]['label'].capitalize()
+                        var_val = client_info[var]
+                        if (divide_by_list[i] != 1):
+                            var_val = int(var_val / divide_by_list[i])
+                        st.sidebar.markdown(
+                            f"<b>{var_label}</b>: {var_val} {chart_dict[var]['unit_side']}", unsafe_allow_html=True)
+
+                st.sidebar.subheader("Compare client")
+
+                chart_option_list = list(chart_option_dict.values())
+                chart_option_list = ['Chart type'] + chart_option_list
+                chart_option_value = st.sidebar.selectbox(
+                    "Select a chart", chart_option_list)
+
+                if (chart_option_value != 'Chart type'):
+                    for key, value in chart_option_dict.items():
+                        if (value == chart_option_value):
+                            col = key
+                            break
+
+                    label = chart_dict[col]['label']
+                    title = chart_dict[col]['title']
+                    unit = chart_dict[col]['unit']
+                    xlabel = f"{label.capitalize()} ({unit})"
+                    divisor = chart_dict[col]['divisor']
+                    data = load_data(col)
+                    plot_hist(data, client_info[col],
+                              title=title, xlabel=xlabel, divisor=divisor)
+        except requests.exceptions.RequestException as e:
+            st.error("Erreur de connexion à l'API : {}".format(e))
 
 
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
