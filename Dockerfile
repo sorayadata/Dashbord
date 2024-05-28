@@ -19,6 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Spécifier la commande par défaut pour exécuter l'application
-CMD ["streamlit", "run", "dashboard.py"]
+CMD ["streamlit", "run", "dashbo.py"]
 
 
