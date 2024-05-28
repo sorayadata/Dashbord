@@ -1,19 +1,20 @@
 # Utiliser une image Python officielle comme base
-FROM python:3.11-slim
-
-# Installer les dépendances de Pillow
-RUN apt-get update && \
-    apt-get install -y zlib1g-dev libjpeg-dev libpng-dev && \
-    rm -rf /var/lib/apt/lists/*
+FROM python:3.11.2-slim
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
 
-# Copier le fichier requirements.txt dans le répertoire de travail
+# Copier d'abord le fichier requirements.txt dans le répertoire de travail
 COPY requirements.txt .
 
 # Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        zlib1g-dev libjpeg-dev libpng-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apt-get purge -y --auto-remove zlib1g-dev libjpeg-dev libpng-dev
 
 # Copier le reste des fichiers de l'application dans le répertoire de travail
 COPY . .
