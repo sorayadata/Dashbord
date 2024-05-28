@@ -160,6 +160,13 @@ def plot_risk(proba, treshold=10, max_val=None):
     fig.update_layout(paper_bgcolor = "white", font = {'color': "darkblue", 'family': "Arial"})
 
     st.plotly_chart(fig)
+    
+@st.cache_data()
+def load_client_info(client_id):
+    response = requests.get(url_api + "/client?id=" + str(client_id))
+    client_info = response.json()
+    return client_info
+    
 
 @st.cache_data
 def load_client_info(client_id):
