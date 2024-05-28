@@ -122,6 +122,12 @@ def main():
             st.error("Erreur de connexion à l'API : {}".format(e))
 
 
+@st.cache_data()
+def load_logo(folder='img', filename='logo', ext='png'):
+    path = './' + folder + '/' + filename + '.' + ext
+    logo = Image.open(path) 
+    return logo
+
 def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     if(divisor!=1):
         data = [d / divisor for d in data]
