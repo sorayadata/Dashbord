@@ -64,7 +64,7 @@ def main():
         title_list = ['Clients age', 'Annuities amount', 'Credits amount', 'Total incomes']
         unit_list_side  = ["years", "$", "$", "$"]
         unit_list  = ["years", "$", "millions $", "millions $"]
-        divide_by_list = [365, 1, 1, 1]
+        divide_by_list = [1, 1, 1, 1]
 
         var_key_list = ['label', 'title', 'unit_side', 'unit', 'divisor']
         var_value_list = [label_list, title_list, unit_list_side, unit_list, divide_by_list]
