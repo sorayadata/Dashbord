@@ -120,9 +120,10 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     plt.ylabel(ylabel, fontsize=12)
     st.pyplot()
 
-def plot_risk(proba, threshold=0.54, max_val=None):
+
+def plot_risk(proba, threshold=54, max_val=None):
     if max_val is None:
-        max_val = threshold
+        max_val = threshold * 2
         
     if proba > max_val:
         max_val = proba
@@ -147,34 +148,9 @@ def plot_risk(proba, threshold=0.54, max_val=None):
     ))
 
     fig.update_layout(paper_bgcolor="white", font={'color': "darkblue", 'family': "Arial"})
-    st.plotly_chart(fig)
-    if max_val is None:
-        max_val = threshold
-        
-    if proba > max_val:
-        max_val = proba
+    st.plotly_chart(fig)   
     
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=proba,
-        domain={'x': [0, 1], 'y': [0, 1]},
-        title={'text': "Default risk (%)", 'font': {'size': 24}},
-        delta={'reference': threshold, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
-        gauge={
-            'axis': {'range': [None, max_val], 'tickwidth': 1, 'tickcolor': "darkblue"},
-            'bar': {'color': "lavender"},
-            'bgcolor': "white",
-            'borderwidth': 2,
-            'bordercolor': "gray",
-            'steps': [
-                {'range': [0, threshold], 'color': 'green'},
-                {'range': [threshold, max_val], 'color': 'red'}
-            ]
-        }
-    ))
-
-    fig.update_layout(paper_bgcolor="white", font={'color': "darkblue", 'family': "Arial"})
-    st.plotly_chart(fig)
+   
 
 @st.cache_data()
 def load_client_info(client_id):
