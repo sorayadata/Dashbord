@@ -149,7 +149,7 @@ def plot_risk(proba, threshold=0.54, max_val=None):
     fig.update_layout(paper_bgcolor="white", font={'color': "darkblue", 'family': "Arial"})
     st.plotly_chart(fig)
     if max_val is None:
-        max_val = treshold * 2
+        max_val = threshold
         
     if proba > max_val:
         max_val = proba
