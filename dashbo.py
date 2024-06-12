@@ -120,7 +120,34 @@ def plot_hist(data, client_value, title, xlabel, ylabel='count', divisor=1):
     plt.ylabel(ylabel, fontsize=12)
     st.pyplot()
 
-def plot_risk(proba, treshold=10, max_val=None):
+def plot_risk(proba, threshold=0.54, max_val=None):
+    if max_val is None:
+        max_val = threshold
+        
+    if proba > max_val:
+        max_val = proba
+    
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number+delta",
+        value=proba,
+        domain={'x': [0, 1], 'y': [0, 1]},
+        title={'text': "Default risk (%)", 'font': {'size': 24}},
+        delta={'reference': threshold, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
+        gauge={
+            'axis': {'range': [None, max_val], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': "lavender"},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "gray",
+            'steps': [
+                {'range': [0, threshold], 'color': 'green'},
+                {'range': [threshold, max_val], 'color': 'red'}
+            ]
+        }
+    ))
+
+    fig.update_layout(paper_bgcolor="white", font={'color': "darkblue", 'family': "Arial"})
+    st.plotly_chart(fig)
     if max_val is None:
         max_val = treshold * 2
         
@@ -132,7 +159,7 @@ def plot_risk(proba, treshold=10, max_val=None):
         value=proba,
         domain={'x': [0, 1], 'y': [0, 1]},
         title={'text': "Default risk (%)", 'font': {'size': 24}},
-        delta={'reference': treshold, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
+        delta={'reference': threshold, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
         gauge={
             'axis': {'range': [None, max_val], 'tickwidth': 1, 'tickcolor': "darkblue"},
             'bar': {'color': "lavender"},
@@ -140,8 +167,8 @@ def plot_risk(proba, treshold=10, max_val=None):
             'borderwidth': 2,
             'bordercolor': "gray",
             'steps': [
-                {'range': [0, treshold], 'color': 'green'},
-                {'range': [treshold, max_val], 'color': 'red'}
+                {'range': [0, threshold], 'color': 'green'},
+                {'range': [threshold, max_val], 'color': 'red'}
             ]
         }
     ))
