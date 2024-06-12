@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 # url_api = 'http://localhost:5000'  # local API
-url_api = "http://13.38.104.45:5000" # online API
+url_api = "http://15.236.141.52:5000" # online API
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
